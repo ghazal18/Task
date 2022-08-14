@@ -16,7 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainFragment : Fragment() {
     lateinit var binding: FragmentMainBinding
     val viewModel: CustomerViewModel by viewModels()
-    var i = 0
+    var counterOfList = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,28 +39,28 @@ class MainFragment : Fragment() {
         sliceCustomer.addAll(setData(arrayOfCustomer))
         val customerAdaptor = CustomAdapter(sliceCustomer)
         binding.customerRecyclerview.adapter = customerAdaptor
+
         fun clearListAddData() {
             sliceCustomer.clear()
             sliceCustomer.addAll(setData(arrayOfCustomer))
             customerAdaptor.notifyDataSetChanged()
-
         }
-        if (i <= 0) {
+        if (counterOfList <= 0) {
             binding.buttonPerv.isEnabled = false
         }
         binding.buttonNext.setOnClickListener {
-            i += 10
+            counterOfList += 10
             binding.buttonPerv.isEnabled = true
             clearListAddData()
-            if (i >= arrayOfCustomer.size - 11) {
+            if (counterOfList >= arrayOfCustomer.size - 11) {
                 binding.buttonNext.isEnabled = false
             }
         }
         binding.buttonPerv.setOnClickListener {
-            i -= 10
+            counterOfList -= 10
             binding.buttonNext.isEnabled = true
             clearListAddData()
-            if (i <= 0) {
+            if (counterOfList <= 0) {
                 binding.buttonPerv.isEnabled = false
             }
         }
@@ -69,8 +69,8 @@ class MainFragment : Fragment() {
     }
 
 
-    fun setData(y: Array<Customers>): Array<Customers> {
-        return y.sliceArray(i..i + 9)
+    fun setData(array: Array<Customers>): Array<Customers> {
+        return array.sliceArray(counterOfList..counterOfList + 9)
     }
 
 
