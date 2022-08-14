@@ -11,10 +11,12 @@ class CustomAdapter(private val dataSet: ArrayList<Customers>) :
 
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val textView: TextView
+        val textViewName: TextView
+        val textViewCode: TextView
 
         init {
-            textView = view.findViewById(R.id.textView)
+            textViewName = view.findViewById(R.id.textViewName)
+           textViewCode = view.findViewById(R.id.textViewCode)
         }
     }
 
@@ -28,7 +30,8 @@ class CustomAdapter(private val dataSet: ArrayList<Customers>) :
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
 
-        viewHolder.textView.text = dataSet[position].Name
+        viewHolder.textViewName.text = dataSet[position].Name
+        viewHolder.textViewCode.text = " کد : ${dataSet[position].Code}"
     }
 
 
