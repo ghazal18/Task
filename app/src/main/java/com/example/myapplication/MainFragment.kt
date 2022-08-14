@@ -2417,16 +2417,14 @@ class MainFragment : Fragment() {
         val arrayCustomerType = object : TypeToken<Array<Customers>>() {}.type
         var arrayOfCustomer: Array<Customers> = gson.fromJson(customerJson, arrayCustomerType)
         var sliceCustomer = ArrayList<Customers>()
-        val customeradaptor = CustomAdapter(sliceCustomer)
-        binding.customerRecyclerview.adapter = customeradaptor
+        sliceCustomer.addAll(setData(arrayOfCustomer))
+        val customerAdaptor = CustomAdapter(sliceCustomer)
+        binding.customerRecyclerview.adapter = customerAdaptor
         binding.buttonNext.setOnClickListener {
-            i = i + 2
-            setData(arrayOfCustomer)
-            println(setData(arrayOfCustomer)[0].Name)
-            println(setData(arrayOfCustomer)[1].Name)
+            i = i + 10
             sliceCustomer.clear()
             sliceCustomer.addAll(setData(arrayOfCustomer))
-            customeradaptor.notifyDataSetChanged()
+            customerAdaptor.notifyDataSetChanged()
         }
 
 
@@ -2434,7 +2432,7 @@ class MainFragment : Fragment() {
 
     fun setData(y: Array<Customers>): Array<Customers> {
         println("the i is $i")
-        return y.sliceArray(i..i + 1)
+        return y.sliceArray(i..i + 9)
     }
 
 
