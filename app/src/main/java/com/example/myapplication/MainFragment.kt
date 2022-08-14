@@ -2420,18 +2420,37 @@ class MainFragment : Fragment() {
         sliceCustomer.addAll(setData(arrayOfCustomer))
         val customerAdaptor = CustomAdapter(sliceCustomer)
         binding.customerRecyclerview.adapter = customerAdaptor
-        binding.buttonNext.setOnClickListener {
-            i = i + 10
+        fun clearListAddData() {
             sliceCustomer.clear()
             sliceCustomer.addAll(setData(arrayOfCustomer))
             customerAdaptor.notifyDataSetChanged()
+
+        }
+        if (i <= 0) {
+            binding.buttonPerv.isEnabled = false
+        }
+        binding.buttonNext.setOnClickListener {
+            i += 10
+            binding.buttonPerv.isEnabled = true
+            clearListAddData()
+            if (i >= arrayOfCustomer.size - 11) {
+                binding.buttonNext.isEnabled = false
+            }
+        }
+        binding.buttonPerv.setOnClickListener {
+            i -= 10
+            binding.buttonNext.isEnabled = true
+            clearListAddData()
+            if (i <= 0) {
+                binding.buttonPerv.isEnabled = false
+            }
         }
 
 
     }
 
+
     fun setData(y: Array<Customers>): Array<Customers> {
-        println("the i is $i")
         return y.sliceArray(i..i + 9)
     }
 
