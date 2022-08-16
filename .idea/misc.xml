@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/HI/app/src/main/res/drawable/ic_baseline_navigate_before_24.xml" value="0.1675" />
+        <entry key="..\:/HI/app/src/main/res/drawable/ic_baseline_navigate_next_24.xml" value="0.1675" />
         <entry key="..\:/HI/app/src/main/res/font/font.xml" value="0.284375" />
         <entry key="..\:/HI/app/src/main/res/layout/activity_main.xml" value="0.264" />
         <entry key="..\:/HI/app/src/main/res/layout/customer_item_view.xml" value="0.25416666666666665" />

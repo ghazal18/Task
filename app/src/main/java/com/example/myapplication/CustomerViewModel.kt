@@ -22,4 +22,7 @@ class CustomerViewModel @Inject constructor(val customerRepository: Repository) 
     fun decNumber(){
         number.value = number.value?.minus(1)
     }
+    fun makeOne(){
+        number.value = 1
+    }
 }

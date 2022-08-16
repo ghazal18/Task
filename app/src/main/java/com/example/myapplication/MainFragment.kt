@@ -2,73 +2,72 @@ package com.example.myapplication
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.KeyEvent
-import android.view.KeyEvent.KEYCODE_ENTER
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.example.myapplication.databinding.FragmentMainBinding
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
-class MainFragment : Fragment() {
-    lateinit var binding: FragmentMainBinding
-    val viewModel: CustomerViewModel by viewModels()
-    var counterOfList = 0
-    var numberOfClassification = 8
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+@AndroidEntryPoint
+class MainFragment : Fragment() ,Listener {
+    lateinit var binding: FragmentMainBinding
+    private val viewModel: CustomerViewModel by viewModels()
+    private var counterOfList = 0
+    private var numberOfClassification = 8
+    private lateinit var customerAdaptor: CustomAdapter
+    val sliceCustomer = ArrayList<Customers>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentMainBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
+
     @SuppressLint("NotifyDataSetChanged")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val gson = Gson()
-        val arrayCustomerType = object : TypeToken<Array<Customers>>() {}.type
-        var arrayOfCustomer: Array<Customers> =
-            gson.fromJson(viewModel.getJson(), arrayCustomerType)
+        val arrayOfCustomer: Array<Customers> =
+            gson.fromJson(viewModel.getJson(), Array<Customers>::class.java)
         var allPageNumber = 0
+        viewModel.number.observe(viewLifecycleOwner) {
+            binding.textViewCurrentPage.text = it.toString()
+        }
+
         fun setInformation() {
-            var sliceCustomer = ArrayList<Customers>()
+            counterOfList = 0
+            viewModel.makeOne()
+            sliceCustomer.clear()
             sliceCustomer.addAll(setData(arrayOfCustomer))
-            val customerAdaptor = CustomAdapter(sliceCustomer)
+            customerAdaptor = CustomAdapter(sliceCustomer,this)
+            customerAdaptor.notifyDataSetChanged()
             binding.customerRecyclerview.adapter = customerAdaptor
-            if (arrayOfCustomer.size % numberOfClassification == 0) {
-                allPageNumber = arrayOfCustomer.size / numberOfClassification
+            allPageNumber = if (arrayOfCustomer.size % numberOfClassification == 0) {
+                arrayOfCustomer.size / numberOfClassification
             } else {
-                allPageNumber = (arrayOfCustomer.size / numberOfClassification) + 1
-            }
-            viewModel.number.observe(viewLifecycleOwner) {
-                binding.textViewCurrentPage.text = it.toString()
+                (arrayOfCustomer.size / numberOfClassification) + 1
             }
             binding.textViewAllPage.text = allPageNumber.toString()
-            fun clearListAddData() {
-                sliceCustomer.clear()
-                sliceCustomer.addAll(setData(arrayOfCustomer))
-                customerAdaptor.notifyDataSetChanged()
-            }
-            if (counterOfList <= 0) {
-                binding.buttonPerv.isEnabled = false
-            }
+
+            binding.buttonPerv.isEnabled = counterOfList > 0
+
+            binding.buttonNext.isEnabled = true
+
+
+
             binding.buttonNext.setOnClickListener {
                 counterOfList += numberOfClassification
                 binding.buttonPerv.isEnabled = true
-                clearListAddData()
+                clearListAddData(sliceCustomer, arrayOfCustomer)
                 if (counterOfList in (arrayOfCustomer.size - (numberOfClassification - 1))..arrayOfCustomer.size) {
                     binding.buttonNext.isEnabled = false
                 }
@@ -78,16 +77,17 @@ class MainFragment : Fragment() {
                 counterOfList -= numberOfClassification
                 viewModel.decNumber()
                 binding.buttonNext.isEnabled = true
-                clearListAddData()
+                clearListAddData(sliceCustomer, arrayOfCustomer)
                 if (counterOfList <= 0) {
                     binding.buttonPerv.isEnabled = false
                 }
             }
         }
+
         setInformation()
 
-        binding.editTextAlPage.setOnEditorActionListener { v, actionId, event ->
-            if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
+        binding.editTextAlPage.setOnEditorActionListener { _, actionId, event ->
+            if ((event != null && (event.keyCode == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_GO)) {
                 numberOfClassification = binding.editTextAlPage.text.toString().toInt()
                 setInformation()
                 true
@@ -97,15 +97,23 @@ class MainFragment : Fragment() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun clearListAddData(sliceCustomer: ArrayList<Customers>, arrayOfCustomer: Array<Customers>) {
+        sliceCustomer.clear()
+        sliceCustomer.addAll(setData(arrayOfCustomer))
+        customerAdaptor.notifyDataSetChanged()
+    }
 
-    fun setData(array: Array<Customers>): Array<Customers> {
-        println("counterOfList $counterOfList")
-        println("array.size ${array.size}")
-        if (counterOfList in (array.size - (numberOfClassification - 1))..array.size) {
-            return array.sliceArray(counterOfList..(counterOfList + (array.size % numberOfClassification) - 1))
+    private fun setData(array: Array<Customers>): Array<Customers> {
+        return if (counterOfList in (array.size - (numberOfClassification - 1))..array.size) {
+            array.sliceArray(counterOfList until counterOfList + (array.size % numberOfClassification))
         } else {
-            return array.sliceArray(counterOfList..counterOfList + (numberOfClassification - 1))
+            array.sliceArray(counterOfList..counterOfList + (numberOfClassification - 1))
         }
+    }
+
+    override fun onItemClick(name: String) {
+        Toast.makeText(context, " $name clicked", Toast.LENGTH_SHORT).show()
     }
 
 
