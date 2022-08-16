@@ -51,6 +51,7 @@ class MainFragment : Fragment() ,Listener {
             customerAdaptor = CustomAdapter(sliceCustomer,this)
             customerAdaptor.notifyDataSetChanged()
             binding.customerRecyclerview.adapter = customerAdaptor
+           binding.editTextAlPage.setText("$numberOfClassification")
             allPageNumber = if (arrayOfCustomer.size % numberOfClassification == 0) {
                 arrayOfCustomer.size / numberOfClassification
             } else {
