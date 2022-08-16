@@ -4,6 +4,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="next">بعدی</string>
     <string name="perv">قبلی</string>
+    <string name="editTextNumberOfShow">تعداد نمایش در هر صفحه:</string>
 
     <string-array name="numberOfPages">
         <item>1</item>
