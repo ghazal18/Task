@@ -34,11 +34,25 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val gson = Gson()
         val arrayCustomerType = object : TypeToken<Array<Customers>>() {}.type
-        var arrayOfCustomer: Array<Customers> = gson.fromJson(viewModel.getJson(), arrayCustomerType)
+        var arrayOfCustomer: Array<Customers> =
+            gson.fromJson(viewModel.getJson(), arrayCustomerType)
         var sliceCustomer = ArrayList<Customers>()
         sliceCustomer.addAll(setData(arrayOfCustomer))
         val customerAdaptor = CustomAdapter(sliceCustomer)
         binding.customerRecyclerview.adapter = customerAdaptor
+        var currentPageNumber = 0
+        var allPageNumber = 0
+        if(arrayOfCustomer.size % 10 == 0){
+            allPageNumber = arrayOfCustomer.size / 10
+        }else{
+            println("sliceCustomer.size / 10 ${sliceCustomer.size / 10}")
+            allPageNumber = (arrayOfCustomer.size / 10) + 1
+        }
+        viewModel.number.observe(viewLifecycleOwner) {
+            binding.textViewCurrentPage.text = it.toString()
+        }
+       binding.textViewAllPage.text = allPageNumber.toString()
+
 
         fun clearListAddData() {
             sliceCustomer.clear()
@@ -52,12 +66,14 @@ class MainFragment : Fragment() {
             counterOfList += 10
             binding.buttonPerv.isEnabled = true
             clearListAddData()
-            if (counterOfList >= arrayOfCustomer.size - 11) {
+            if (counterOfList in (arrayOfCustomer.size-9)..arrayOfCustomer.size) {
                 binding.buttonNext.isEnabled = false
             }
+            viewModel.riseNumber()
         }
         binding.buttonPerv.setOnClickListener {
             counterOfList -= 10
+            viewModel.decNumber()
             binding.buttonNext.isEnabled = true
             clearListAddData()
             if (counterOfList <= 0) {
@@ -70,7 +86,13 @@ class MainFragment : Fragment() {
 
 
     fun setData(array: Array<Customers>): Array<Customers> {
-        return array.sliceArray(counterOfList..counterOfList + 9)
+        println("counterOfList $counterOfList")
+        println("array.size ${array.size}")
+        if (counterOfList in (array.size-9)..array.size){
+            return array.sliceArray(counterOfList..(counterOfList + (array.size % 10) -1))
+        } else {
+            return array.sliceArray(counterOfList..counterOfList + 9)
+        }
     }
 
 
